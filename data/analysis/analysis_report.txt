@@ -1,0 +1,10 @@
+* Translation dataset analysis *
+
+Total pairs: 6,786,307
+Unique sentences: 3,098,797 (Ja), 3,016,887 (Vi)
+
+Length Statistics:
+Japanese: avg=27.1, 95th percentile=66
+Vietnamese: avg=53.7, 95th percentile=140
+
+Average Vi/Ja character ratio: 1.99

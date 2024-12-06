@@ -1,0 +1,6 @@
+data/raw/
+data/cleaned/
+__pycache__/
+data/aligned/parallel.csv
+ja_temp.txt
+vi_temp.txt
