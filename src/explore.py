@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 import unicodedata
+from collections import Counter
 
 class DataExplorer:
     def __init__(self, data_path: str):
@@ -19,7 +20,7 @@ class DataExplorer:
         )
         # Add one line to remove any null values that might cause issues
         self.df = self.df.dropna(subset=['japanese', 'vietnamese'])
-    
+
     def analyze_writing_systems(self, text: str) -> dict:
         counts = {'kanji': 0, 'hiragana': 0, 'katakana': 0, 'other': 0}
         for char in text:
@@ -33,6 +34,22 @@ class DataExplorer:
             else:
                 counts['other'] += 1
         return counts
+
+    def estimate_vocabulary_size(self, column: str, num_samples: int = 300000) -> int:
+        
+        # Select a random subset of sentences.
+        subset = self.df[column].sample(n=min(num_samples, len(self.df)), random_state=42)
+        
+        # Tokenize the sentences in the subset 
+        token_counts = Counter()
+        for sentence in subset:
+            tokens = sentence.lower().split() 
+            token_counts.update(tokens)
+        
+        # Estimate the total vocabulary size based on the subset.
+        estimated_vocab_size = len(token_counts)
+        
+        return estimated_vocab_size
     
     def generate_plots(self):
         output_dir = Path("data/analysis")
@@ -72,37 +89,45 @@ class DataExplorer:
         plt.title('Japanese writing system distribution')
         plt.savefig(output_dir / 'writing_distribution.png')
         plt.close()
-    
+
     def generate_report(self):
         output_dir = Path("data/analysis")
         output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Calculate statistics
         ja_lengths = self.df['japanese'].str.len()
         vi_lengths = self.df['vietnamese'].str.len()
-        
+
         # Calculate Vi/Ja character ratio
         total_ja_chars = ja_lengths.sum()
         total_vi_chars = vi_lengths.sum()
         char_ratio = total_vi_chars / total_ja_chars
-        
+
         # Convert to numpy array for reliable percentile calculation
         ja_lengths_array = np.array(ja_lengths)
         vi_lengths_array = np.array(vi_lengths)
-        
+
+        # Estimate vocabulary sizes
+        ja_vocab_size_estimate = self.estimate_vocabulary_size('japanese')
+        vi_vocab_size_estimate = self.estimate_vocabulary_size('vietnamese')
+
         with open(output_dir / "analysis_report.txt", 'w', encoding='utf-8') as f:
             f.write("* Translation dataset analysis *\n\n")
             f.write(f"Total pairs: {len(self.df):,}\n")
             f.write(f"Unique sentences: {self.df['japanese'].nunique():,} (Ja), "
-                   f"{self.df['vietnamese'].nunique():,} (Vi)\n\n")
-            
+                    f"{self.df['vietnamese'].nunique():,} (Vi)\n\n")
+
             f.write("Length Statistics:\n")
             f.write(f"Japanese: avg={ja_lengths.mean():.1f}, "
-                   f"95th percentile={np.percentile(ja_lengths_array, 95):.0f}\n")
+                    f"95th percentile={np.percentile(ja_lengths_array, 95):.0f}\n")
             f.write(f"Vietnamese: avg={vi_lengths.mean():.1f}, "
-                   f"95th percentile={np.percentile(vi_lengths_array, 95):.0f}\n\n")
-            
-            f.write(f"Average Vi/Ja character ratio: {char_ratio:.2f}\n")
+                    f"95th percentile={np.percentile(vi_lengths_array, 95):.0f}\n\n")
+
+            f.write(f"Average Vi/Ja character ratio: {char_ratio:.2f}\n\n")
+
+            f.write("Vocabulary Size Estimation (using a subset of the data):\n")
+            f.write(f"Estimated Japanese Vocabulary Size: {ja_vocab_size_estimate:,}\n")
+            f.write(f"Estimated Vietnamese Vocabulary Size: {vi_vocab_size_estimate:,}\n")
 
 def main():
     explorer = DataExplorer("data/aligned/parallel.csv")

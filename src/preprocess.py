@@ -11,7 +11,7 @@ import time
 import tracemalloc
 
 class CustomTokenizer:
-    def __init__(self, vocab_size: int = 80000):
+    def __init__(self, vocab_size: int = 350000):
         self.vocab_size = vocab_size
         self.sp_ja = None
         self.sp_vi = None
@@ -32,7 +32,7 @@ class CustomTokenizer:
         spm.SentencePieceTrainer.train(
             input='vi_temp.txt',
             model_prefix=f'{model_prefix}_vi',
-            vocab_size=int(self.vocab_size * 0.7),
+            vocab_size=int(self.vocab_size * 0.5),
             character_coverage=0.9990,
             model_type='unigram'
         )
