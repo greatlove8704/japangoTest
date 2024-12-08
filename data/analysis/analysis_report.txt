@@ -10,5 +10,5 @@ Vietnamese: avg=53.7, 95th percentile=140
 Average Vi/Ja character ratio: 1.99
 
 Vocabulary Size Estimation (using a subset of the data):
-Estimated Japanese Vocabulary Size: 378,984
-Estimated Vietnamese Vocabulary Size: 163,537
+Estimated Japanese Vocabulary Size: 3,500,327
+Estimated Vietnamese Vocabulary Size: 779,575

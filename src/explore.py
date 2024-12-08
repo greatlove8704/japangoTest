@@ -35,7 +35,7 @@ class DataExplorer:
                 counts['other'] += 1
         return counts
 
-    def estimate_vocabulary_size(self, column: str, num_samples: int = 300000) -> int:
+    def estimate_vocabulary_size(self, column: str, num_samples: int = 6786307) -> int:
         
         # Select a random subset of sentences.
         subset = self.df[column].sample(n=min(num_samples, len(self.df)), random_state=42)

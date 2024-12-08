@@ -5,16 +5,21 @@ class DataAligner:
     def __init__(self, raw_data_dir: str):
         self.data_dir = Path(raw_data_dir)
     
+    def _clean_text(self, text: str) -> str:
+        return text.strip()
+    
+    def _read_and_clean_file(self, filepath: Path, convert_float: bool = False) -> list:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            if convert_float:
+                return [float(self._clean_text(line)) for line in f]
+            return [self._clean_text(line) for line in f]
+    
     def align_and_save(self):
-        # Read files as-is
-        with open(self.data_dir / "combinedja.ja-vi.ja", 'r', encoding='utf-8') as f:
-            ja_lines = [line.strip() for line in f]
-        
-        with open(self.data_dir / "combinedvi.ja-vi.vi", 'r', encoding='utf-8') as f:
-            vi_lines = [line.strip() for line in f]
-            
-        with open(self.data_dir / "combinedscores.ja-vi.scores", 'r', encoding='utf-8') as f:
-            scores = [float(line.strip()) for line in f]
+        # Read and clean files
+        ja_lines = self._read_and_clean_file(self.data_dir / "combinedja.ja-vi.ja")
+        vi_lines = self._read_and_clean_file(self.data_dir / "combinedvi.ja-vi.vi")
+        scores = self._read_and_clean_file(self.data_dir / "combinedscores.ja-vi.scores", 
+                                         convert_float=True)
         
         # Create + save DataFrame
         df = pd.DataFrame({
